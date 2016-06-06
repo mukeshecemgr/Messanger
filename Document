@@ -1,0 +1,12 @@
+-No functionality added for selecting the dynamic argument option, probably use optarg()
+- As per now using Switch case
+- Server IP address is taken hard coded in client side, letter will see to replace it with some dynamic
+mechanism like DNS or DHCP.
+- Only two user and one server is being demonstrated here, leter more user will be added
+- Seperate socket path for data and control message
+- later implement message queue distroyer function
+
+
+
+
+
