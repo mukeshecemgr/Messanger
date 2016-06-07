@@ -58,3 +58,9 @@ void user_init()
 
 
 }
+
+void init_usr_msg_data_path()
+{
+	
+	online_userinfo_t *they = NULL;
+
