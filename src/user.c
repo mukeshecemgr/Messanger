@@ -19,6 +19,20 @@ void user_master_task(void *data)
 
 		switch(msg.type)
 		{
+			case RESPOSE:
+				user_handle_respose_message(msg.data,msg.ctx);
+			break;
+			case NOTIFICATION:
+				user_handle_notification_msg(msg.data,msg.ctx);
+			break;
+			case CHAT_TERMINATION:
+				user_handle_chat_termination_notification(msg.data,msg.ctx);
+			break;
+			case SESSION_TERMINATION:
+				user_notify_for_session_termination(msg.data,msg.ctx);
+			break;
+			default:
+			printf("Fatel Error: Wrong message type received\n");
 		}
 	}
 }

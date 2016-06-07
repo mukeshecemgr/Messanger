@@ -11,6 +11,16 @@
 #define CONTROL_PORT 11111
 #define DATA_PORT 22222
 
+typedef enum message_type_
+{
+	REQUEST = 1,
+	RESPONSE,
+	NOTIFICATION,
+	CHAT_TERMINATION,
+	SESSION_TERMINATION
+}message_type_t;
+
+
 typedef struct args_
 {
 	int arg1;
@@ -49,6 +59,7 @@ typedef struct ipc_header_
 	void (*free_cb) (void *);   /*callback function to free the data part */
 	char *mem_pool;
 }ipc_header_t;
+
 void user_init(void);
 void server_init(void);
 void admin_task(void);

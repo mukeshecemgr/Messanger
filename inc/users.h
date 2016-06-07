@@ -45,4 +45,5 @@ typedef struct user_ipc_ {
 	int type;
 	int len;
 	void *data;
+	void *ctx;
 }user_ipc_t;
