@@ -43,15 +43,17 @@ void user_master_task(void *data)
 void fill_user_info(user_info_t *me)
 {
 	printf("Enter personal Information\n");
-	printf("Name: ");
+	printf("Name:");
 	scanf("%s",me->name);
-	printf("Age: ");
+	printf("Age:");
 	scanf("%d",&me->age);
-	printf("Sex : ");
-	scanf("%c",&me->sex);
+	//printf("Sex :");
+//	scanf("%c",&me->sex);
+	return;
 }
 void user_init()
 {
+        args_t args;
 	if ( NULL == user)
 	{
 	    user = (user_ctx_t *)malloc(sizeof(user_ctx_t));
@@ -65,13 +67,17 @@ void user_init()
 	user->me = (user_info_t *)malloc(sizeof(user_info_t));
 	memset(user->me,0,sizeof(user_info_t));
 
-	fill_user_info(user->me);	
-	if (0==( user->master_qid = task_mq_create(100,sizeof(ipc_header_t),0,USER_MASTER_Q)))
+	fill_user_info(user->me);
+
+	memset(&args,0,sizeof(args_t));
+
+	user->master_qid = task_mq_create(100,sizeof(ipc_header_t),0,USER_MASTER_Q);
+	if (0 > user->master_qid )
 	{
 		printf("failed to create mq :%s\n",__FUNCTION__);
 		exit(1);
 	}
-	if ( 0 != task_spawn("master_task",25,600000,(PFN)user_master_task,NULL))
+	if ( 0 != task_spawn("master_task",25,1600000,(PFN)user_master_task,&args))
 	{
 		printf("Failed to create user master task\n");
 		exit(1);

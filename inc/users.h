@@ -1,7 +1,7 @@
 #ifndef _USERS_H
 #define _USERS_H
 
-#define USER_MASTER_Q "/user_master"
+#define USER_MASTER_Q "/Master_user_mq"
 
 //typedef int (*msg_recv_cb)(int len,char *data, void *ctx);
 
@@ -45,7 +45,7 @@ typedef struct user_ipc_ {
 }user_ipc_t;
 
 void init_ctrl_path(connection_info_t *);
-int ctrl_recv_cb(int, char *,void *);
+int ctrl_recv_cb(int, unsigned char *,void *);
 void user_ctrl_rx_task(void *);
 void init_usr_msg_data_path();
 

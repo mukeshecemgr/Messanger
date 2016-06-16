@@ -13,13 +13,6 @@ typedef struct server_ctx_
 	int server_master_mq_id;
 }server_ctx_t;
 
-typedef struct master_ipc_ {
-	int type;
-	void *data;
-	void *ctx;
-	int len;
-}master_ipc_t;
-
 int servr_ctrl_rx_cb(int ,unsigned char *, void *);
 void server_ctrl_rx_task(void *);
 

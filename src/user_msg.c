@@ -1,6 +1,9 @@
 #include "common.h"
 #include "users.h"
 #include "message.h"
+
+extern user_ctx_t *user;
+
 int user_handle_response_message(void *msg,void *ctx)
 {
 }
@@ -33,24 +36,51 @@ int prepare_and_send_req_msg(connection_info_t *ctrl_conn,user_info_t *me)
 	strcpy(req->name,"Mukesh");
 	req->age = 30;
 	req->sex = 'M';
-	
+	/*
 	if ( 0 != Encode_MSG((void *)req,buff,&len,REQUEST))
 	{
 		printf("Failed to encode REQUEST message\n");
 		return 1;
 	}
-
-	if ( 0 > (sendto(ctrl_conn->sd,buff,100,0,(struct sockaddr *)&ctrl_conn->srvr,
+*/
+	if ( 0 > (sendto(ctrl_conn->sd,buff,sizeof(buff),0,(struct sockaddr *)&ctrl_conn->srvr,
 					sizeof(struct sockaddr))) )
 	{
 		printf("Failed : to send request message to server\n");
 		return 1;
 	}
+	return 0;
 
 }
 
-int ctrl_recv_cb(int len, char *data, void *ctx)
+int ctrl_recv_cb(int len,unsigned char *data, void *ctx)
 {
+          printf("User Received message \n");
+          ipc_header_t ipc;
+          master_ipc_t *msg = (master_ipc_t *)malloc(sizeof(master_ipc_t));
+          int mt = 0;
+          void *pvalue = NULL;
+          if ( 0 != Decode_MSG(data,&len,&mt,&pvalue))
+          {
+                  printf("[%d][%s]failed to decode message\n",__LINE__,__FUNCTION__);
+                  return;
+          }
+
+          msg->data = pvalue;
+          msg->ctx = ctx;
+
+          /*Send to master task, Where all control message will be
+          * processes */
+          ipc.type = mt;
+          ipc.len = sizeof(ipc_header_t);
+          ipc.data = msg;
+          if ( 0 != task_mq_send(USER_MASTER_Q,user->master_qid,
+                                          (char *)&ipc,sizeof(ipc_header_t),0))
+          {
+                  printf("[%d][%s]Failed to post into mq\n",__LINE__,__FUNCTION__);
+                  return;
+          }
+
 	return 0;
 }
 

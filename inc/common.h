@@ -68,6 +68,16 @@ typedef struct slist_
 	void *node;
 }slist_t;
 
+
+
+typedef struct master_ipc_ {
+        int type;
+        void *data;
+        void *ctx;
+        int len;
+}master_ipc_t;
+
+
 void user_init(void);
 void server_init(void);
 void admin_task(void);
