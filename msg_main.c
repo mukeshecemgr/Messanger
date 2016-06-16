@@ -9,27 +9,31 @@ int signal_handler()
 
 int main(int argc, char *argv[])
 {
-	signal(SIGINT,signal_handler);
-	signal(SIGQUIT,signal_handler);
+//	signal(SIGINT,signal_handler);
+//	signal(SIGQUIT,signal_handler);
 	int opt;
 	while(1)
 	{
-			printf("|-----------------------------")
+			printf("|-----------------------------\n");
 			printf("|1.Server\n|2.User\n|3.Press ctrl+c to close");
 			scanf("%d",&opt);
 			switch(opt)
 			{
-				case USER:
-					user_init();
-					break;
 				case SERVER:
 					server_init();
 					break;
+				case USER:
+					user_init();
+					break;
 				case ADMIN:
-					admin_task();
+//					admin_task();
 					break;
 				default:
 					printf("Wrong option selected");
 			}
+	}
+	while(1)
+	{
+		sleep(1000);
 	}
 }

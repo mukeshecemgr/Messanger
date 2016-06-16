@@ -3,10 +3,12 @@
 - Server IP address is taken hard coded in client side, letter will see to replace it with some dynamic
 mechanism like DNS or DHCP.
 - Only two user and one server is being demonstrated here, leter more user will be added
-- Seperate socket path for data and control message
+- Seperate socket path for data and control message ( ctrl port = 11111, data port = 22222)
 - later implement message queue distroyer function
 
-
+-Need to write Encode and Decode function for every message. So far wrote API names and structures, 
+-Initially without encoder all message will be transmitted
+- Replace all harcoded value IP and Port with macros/or some dyanamic allocationfunction / or through configuration file
 
 
 

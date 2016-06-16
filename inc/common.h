@@ -1,27 +1,20 @@
+#ifndef _COMMON_H
+#define _COMMON_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-
-#define USER 	1
-#define SERVER 	2
+#include <netinet/in.h>
+#define USER 	2
+#define SERVER 	1
 #define ADMIN 	3
 
 #define CONTROL_PORT 11111
 #define DATA_PORT 22222
 
-typedef enum message_type_
-{
-	REQUEST = 1,
-	RESPONSE,
-	NOTIFICATION,
-	CHAT_TERMINATION,
-	SESSION_TERMINATION
-}message_type_t;
-
-
-typedef struct args_
+typedef struct arguments_
 {
 	int arg1;
 	int arg2;
@@ -29,11 +22,20 @@ typedef struct args_
 	int arg4;
 }args_t;
 
-typedef struct slist_ {
-	struct slist_ *next;
-	void *node;
-}slist_t;
 
+typedef int (*msg_recv_cb)(int,unsigned char *,void *);
+
+typedef struct connection_info_
+{
+	int rx_qid;
+	int port;
+	int sd;
+	char ip[16];
+	struct sockaddr_in srvr;
+	msg_recv_cb msg_cb;
+}connection_info_t;
+
+/*
 typedef struct server_info_
 {
 	int sd;
@@ -48,7 +50,7 @@ typedef struct client_
 	char ip[16];
 	int port;
 } client_t;
-
+*/
 typedef struct ipc_header_
 {
     int type;          /* IPC Message type */
@@ -60,9 +62,15 @@ typedef struct ipc_header_
 	char *mem_pool;
 }ipc_header_t;
 
+typedef struct slist_
+{
+	struct slist_ *next;
+	void *node;
+}slist_t;
+
 void user_init(void);
 void server_init(void);
 void admin_task(void);
 
 
-
+#endif

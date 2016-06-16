@@ -1,6 +1,9 @@
-#include "common.h"
+#ifndef _USERS_H
+#define _USERS_H
 
-typedef int (*msg_recv_cb)(int len,char *data, void *ctx);
+#define USER_MASTER_Q "/user_master"
+
+//typedef int (*msg_recv_cb)(int len,char *data, void *ctx);
 
 typedef struct user_info_
 {
@@ -23,13 +26,6 @@ typedef struct online_userinfo_
 	int online_status;
 }online_userinfo_t;
 
-typedef struct connection_info_
-{
-	int port;
-	int sd;
-	char ip[16];
-	msg_recv_cb msg_cb;
-}connection_info_t;
 typedef struct user_ctx_
 {
 	int ctrl_port;
@@ -47,3 +43,10 @@ typedef struct user_ipc_ {
 	void *data;
 	void *ctx;
 }user_ipc_t;
+
+void init_ctrl_path(connection_info_t *);
+int ctrl_recv_cb(int, char *,void *);
+void user_ctrl_rx_task(void *);
+void init_usr_msg_data_path();
+
+#endif

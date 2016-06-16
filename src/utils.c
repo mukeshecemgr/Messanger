@@ -1,5 +1,5 @@
 #include "common.h"
-
+#include "utils.h"
 void slist_add(slist_t **list, void *item)
 {
 	slist_t *new = NULL;
@@ -17,26 +17,7 @@ void slist_add(slist_t **list, void *item)
 }
 
 
-int client_init(server_info_t *serv)
-{
-	int sfd;
-	struct sockaddr_in server;
-
-	sfd = socket(AF_INET,SOCK_DGRAM,0);
-
-	server.sin_family = AF_INET;
-	server.sin_addr.s_addr = serv->ip;
-	server.sin_port = serv->port;
-	serv->ser_in = &server;
-
-	serv->sd = sfd;
-
-}
-
-
-
-
-int task_spawn(char *name, int task_priority,int stack,
+int task_spawn(char *name, int vx_priority,int stack_size,
 					void *(*function)(void*),void *args)
 {
 	pthread_attr_t thread_attributes;
@@ -67,7 +48,7 @@ int task_spawn(char *name, int task_priority,int stack,
 		printf ("%s task : failed to set the stack size\n", name );
 	    return -1;
 	}
-	if (task_priority < 99)
+	if (vx_priority < 99)
 	{
 		priority = 99 - vx_priority;
 	} else {
@@ -85,7 +66,7 @@ int task_spawn(char *name, int task_priority,int stack,
         printf  ("failed to set inherit\n");
 		return -1;
 	}
-	if (0 != pthread_create (&thread_id, &thread_attributes, function, args1))
+	if (0 != pthread_create (&thread_id, &thread_attributes, function, args))
 	{
 		printf ("%s task :failed to create a thread\n",name);
 		return -1;
@@ -137,7 +118,7 @@ task_mq_create (int max_msgs,
 }
 
 
-SAI_STATUS
+int
 task_mq_send (unsigned char *mq_name,
              int mq_id,
              char *msg,
@@ -154,11 +135,11 @@ task_mq_send (unsigned char *mq_name,
 }
 
 
-SAI_STATUS
+int
 task_mq_receive (unsigned char *mq_name,
                 int msgqid,
                 char *msg,
-                SAI_UINT32 msg_len,
+                unsigned int msg_len,
                 int timeout)
 {
     struct timespec td;

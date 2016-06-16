@@ -1,20 +1,49 @@
+#include "message.h"
 #include "common.h"
+#include "users.h"
+#include "server.h"
 
-void user_msg_rx_worker(void *data)
+void user_ctrl_rx_task(void *data)
 {
 	args_t *args = (args_t *)data;
-	server_info_t *sr = (server_info_t *)args->arg1;
-	online_userinfo_t *friend = (online_user_info_t *)args2;
-	user_info_t *me = (user_info_t *)args->arg3;
-	struct sockaddr_in clnt;
-	int sz =0,len = sizeof(clnt);
+	connection_info_t *ctrl = (connection_info_t *)args->arg1;
+	struct sockaddr_in serv;
+	int sz =0,len = sizeof(serv);
+	unsigned char ctrl_buff[1024]  ={0};
 	while(1)
 	{
-		sz = recvfrom(sr->sd,msg_box,sizeof(msg_buf),0,(struct sockaddr *)&clnt,
-						sizeof(struct sockaddr)&len);
+		sz = recvfrom(ctrl->sd,ctrl_buff,sizeof(ctrl_buff),0,(struct sockaddr *)&serv,
+						&len);
 		if ( sz < 0)
 			continue;
 		else
-			printf("%s:",friend->name);
+			ctrl->msg_cb(sz,ctrl_buff,&serv);
+
 	}
+	return;
+}
+
+void user_data_rx_task(void *data)
+{
+	return;
+}
+
+void server_ctrl_rx_task(void *data)
+{
+	long unsigned int sz = 0;
+	args_t *args = (args_t *)data;
+	connection_info_t *conn = (connection_info_t *)args->arg1;
+	struct sockaddr_in clnt;
+	int len = sizeof(clnt);
+	unsigned char buff[1024] = {0};
+	while(1)
+	{
+		sz = recvfrom(conn->sd,buff,sizeof(buff),0,(struct sockaddr*)&clnt,&len);
+
+		if ( sz < 0)
+			continue;
+		else
+			conn->msg_cb(len,buff,(void *)&clnt);
+	}
+	return;
 }
