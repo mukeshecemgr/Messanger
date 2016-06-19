@@ -6,6 +6,7 @@ server_ctx_t *srvr_ctx;
 
 int servr_ctrl_rx_cb(int len, unsigned char *data, void *ctx)
 {
+        printf("Server Received message %p\n",data);
 	ipc_header_t ipc;	
 	master_ipc_t *msg = (master_ipc_t *)malloc(sizeof(master_ipc_t));
 	int mt = 0;
@@ -61,10 +62,11 @@ void start_server(connection_info_t *conn)
 		return;
 	}
 */
+	//sleep(1);
 	memset(&args,0,sizeof(args_t));
-	args.arg1 = (int )conn;
-	if ( 0 != task_spawn("Server_rx",25,600000,
-							(PFN)server_ctrl_rx_task,(void *)&args))
+	//args.arg1 = (int )conn;
+	if ( 0 != task_spawn("Server_rx",25,1600000,
+                                          (PFN)server_ctrl_rx_task,(void *)conn))
 	{
 		printf("[%d][%s]Failed to create thread\n",__LINE__,__FUNCTION__);
 		return;
@@ -76,6 +78,7 @@ void start_server(connection_info_t *conn)
 
 void server_master_task(void *data)
 {
+        printf("Master thread Created\n");
 	ipc_header_t ipc_msg;
 	master_ipc_t *msg;
 	int status = 0;
@@ -107,6 +110,7 @@ void server_master_task(void *data)
 
 void server_init()
 {
+        printf("Initializing the server\n");
 	args_t args;
 	server_ctx_t *ctx = NULL;
 
@@ -121,7 +125,7 @@ void server_init()
 	
 	start_server(ctx->serv_conn);	
 
-	ctx->server_master_mq_id = task_mq_create(100,sizeof(ipc_header_t),0,"Master_MQ");
+	ctx->server_master_mq_id = task_mq_create(100,sizeof(ipc_header_t),0,SERVER_MASTER_MQ);
 	if ( 0 > ctx->server_master_mq_id)
 	{
 		printf("[%d][%s]Failed to create Master message Q\n",__LINE__,__FUNCTION__);
@@ -131,14 +135,14 @@ void server_init()
 	memset(&args,0,sizeof(args_t));
 
 	if ( 0 != task_spawn("Server_Master",25,1600000,
-							server_master_task,&args))
+							(PFN)server_master_task,&args))
 	{
 		printf("[%d][%s]Failed to create thread\n",__LINE__,__FUNCTION__);
 		return;
 	}
 	
 
-srvr_ctx = ctx;	
+	srvr_ctx = ctx;
 	
 }
 

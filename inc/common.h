@@ -7,6 +7,9 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+
+#define TRUE 1
+#define FALSE 0
 #define USER 	2
 #define SERVER 	1
 #define ADMIN 	3

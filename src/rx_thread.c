@@ -32,16 +32,17 @@ void server_ctrl_rx_task(void *data)
 {
         printf("Server Waiting for Client...\n");
 	long unsigned int sz = 0;
-	args_t *args = (args_t *)data;
-	connection_info_t *conn = (connection_info_t *)args->arg1;
+	//args_t *args = (args_t *)data;
+	connection_info_t *conn = (connection_info_t *)data;
 	if ( NULL == conn)
         {
 	    printf("[%d][%s]NULL Conn info received\n",__LINE__,__FUNCTION__);
+	    return ;
         }
 	struct sockaddr_in clnt;
 	int len = sizeof(clnt);
 	unsigned char buff[1024] = {0};
-	sleep(1);
+
 	while(1)
 	{
 		sz = recvfrom(conn->sd,buff,sizeof(buff),0,(struct sockaddr*)&clnt,&len);

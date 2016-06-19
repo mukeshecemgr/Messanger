@@ -26,24 +26,27 @@ int user_notify_for_session_termination(void *data,void *ctx)
 
 int prepare_and_send_req_msg(connection_info_t *ctrl_conn,user_info_t *me)
 {
-	unsigned char buff[2048] = {0};
+	unsigned char buff[1024] = {0};
 	int len  = 0;
 	user_req_msg_t *req = NULL;
 
 	req = (user_req_msg_t *)malloc(sizeof(user_req_msg_t));
 	memset(req,0,sizeof(user_req_msg_t));
 	
-	strcpy(req->name,"Mukesh");
+	memcpy(req->name,"Mukesh",strlen("Mukesh")+1);
 	req->age = 30;
 	req->sex = 'M';
-	/*
+	memcpy(req->mob,"9884465584",strlen("9884465584")+1);
+	memcpy(req->location,"Chennai",strlen("Chennai")+1);
+
 	if ( 0 != Encode_MSG((void *)req,buff,&len,REQUEST))
 	{
 		printf("Failed to encode REQUEST message\n");
 		return 1;
 	}
-*/
-	if ( 0 > (sendto(ctrl_conn->sd,buff,sizeof(buff),0,(struct sockaddr *)&ctrl_conn->srvr,
+	printf("Enoded Buffer : %p\n",buff);
+
+	if ( 0 > (sendto(ctrl_conn->sd,buff,len,0,(struct sockaddr *)&ctrl_conn->srvr,
 					sizeof(struct sockaddr))) )
 	{
 		printf("Failed : to send request message to server\n");

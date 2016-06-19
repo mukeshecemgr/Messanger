@@ -42,11 +42,11 @@ void user_master_task(void *data)
 
 void fill_user_info(user_info_t *me)
 {
-	printf("Enter personal Information\n");
-	printf("Name:");
-	scanf("%s",me->name);
-	printf("Age:");
-	scanf("%d",&me->age);
+	//printf("Enter personal Information\n");
+//	printf("Name:");
+//	scanf("%s",me->name);
+//	printf("Age:");
+//	scanf("%d",&me->age);
 	//printf("Sex :");
 //	scanf("%c",&me->sex);
 	return;

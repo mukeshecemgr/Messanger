@@ -3,8 +3,8 @@
 
 #include "common.h"
 
-typedef int (*Encoder_wrapper)(void *, int *);
-typedef int (*Decoder_wrapper)();
+typedef int (*Encoder_wrapper)(void *,unsigned char *, int *);
+typedef int (*Decoder_wrapper)(unsigned char *, void **,int);
 
 
 
@@ -15,25 +15,35 @@ typedef struct msg_pdu_handlers_
 	Decoder_wrapper dfunc;
 }msg_pdu_handler_t;
 
-int Request_E_Func(void *,int *);
-int Request_D_func();
+typedef enum req_
+{
+  NAME = 101,
+  AGE,
+  SEX,
+  MOB,
+  LOCATION
+}req_e;
 
-int Notification_Req_E(void *,int *);
-int Notification_Req_D();
 
-int Response_E_func(void*,int*);
-int Response_D_Func();
+int Request_E_Func(void *,unsigned char *,int *);
+int Request_D_Func(unsigned char *, void **,int );
 
-int Notification_Res_E(void *,int *);
-int Notification_Res_D();
+int Notification_Req_E(void *,unsigned char *,int *);
+int Notification_Req_D(unsigned char *, void **,int );
 
-int Termination_Req_E(void *,int *);
-int Termination_Req_D();
+int Response_E_Func(void *,unsigned char *,int *);
+int Response_D_Func(unsigned char *, void **,int );
 
-int Termination_Res_E(void *, int *);
-int Termination_Res_D(void *,int *);
+int Notification_Res_E(void *,unsigned char *,int *);
+int Notification_Res_D(unsigned char *, void **,int );
 
-int Decode_MSG(void *,int *,int *,void **);
+int Termination_Req_E(void *,unsigned char *,int *);
+int Termination_Req_D(unsigned char *, void **,int );
+
+int Termination_Res_E(void *,unsigned char *,int *);
+int Termination_Res_D(unsigned char *, void **,int );
+
+int Decode_MSG(unsigned char *,int *,int *,void **);
 int Encode_MSG(void *,unsigned char *,int *,int );
 
 
