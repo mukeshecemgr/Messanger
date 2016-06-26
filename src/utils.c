@@ -29,6 +29,7 @@ void slist_add(slist_t **list, void *item)
 	if ( *list == NULL )
 	{
 		*list = new;
+
 	} else {
 		new->next = *list;
 		*list = new;
