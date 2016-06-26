@@ -15,7 +15,7 @@
 #define ADMIN 	3
 
 #define CONTROL_PORT 11111
-#define DATA_PORT 22222
+
 
 typedef struct arguments_
 {

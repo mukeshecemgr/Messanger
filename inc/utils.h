@@ -20,8 +20,14 @@
 #define         MODEMDEVICE      "/dev/ttyS0"
 #define         MAX_READ_BUFF    256
 
+typedef int
+(*slist_find_compare_func) (void *list_elem,
+                               void *user_data);
+
 typedef void *(*PFN)(void *);
 
+
+void *slist_find(slist_t *, slist_find_compare_func ,void *);
 void slist_add(slist_t **, void *);
 int task_spawn(char *, int , int, void *(*function)(void *),void *);
 int task_mq_create(int,int, int, char *);

@@ -12,14 +12,9 @@ static msg_pdu_handler_t PDU_APIs[] = {
 	Response_D_Func
 },
 {
-	NOTIFICATION_REQ,
+	NOTIFICATION,
 	Notification_Req_E,
 	Notification_Req_D
-},
-{
-	NOTIFICATION_RES,
-	Notification_Res_E,
-	Notification_Res_D
 },
 {
 	TERMINATION_REQ,
@@ -35,9 +30,9 @@ static msg_pdu_handler_t PDU_APIs[] = {
 
 int Request_E_Func(void *data,unsigned char *buff,int *len)
 {
-  printf("Encoding ------------->\n");
+
   int i_len = 0;
-  int name_len = 0,mob_len = 0,location_len = 0;
+  int idx = 0, name_len = 0,mob_len = 0,location_len = 0, contact_len = 0;
   user_req_msg_t *req = (user_req_msg_t *)data;
 
   buff[i_len++] = NAME;
@@ -50,26 +45,39 @@ int Request_E_Func(void *data,unsigned char *buff,int *len)
   buff[i_len++] = req->age;
   buff[i_len++] = SEX;
   buff[i_len++] = req->sex;
+
   buff[i_len++] = MOB;
   mob_len = strlen(req->mob)+1;
+  buff[i_len++] = mob_len;
   memcpy(buff+i_len,req->mob,mob_len);
-//  printf("Emob :%s\n",req->mob);
   i_len += mob_len;
+
+  buff[i_len++] = LOCATION;
   location_len = strlen(req->location)+1;
+  buff[i_len++] = location_len;
   memcpy(buff+i_len,req->location,location_len);
-//  printf("Elocation :%s\n",req->location);
   i_len += location_len;
 
-  *len = i_len;
+  buff[i_len++] = CONTACTS;
+  buff[i_len++] = req->contact_count;
+  for ( idx = 0; idx < req->contact_count; idx++)
+  {
+      contact_len = strlen(req->contacts[idx].c_name_id)+1;
+      buff[i_len++] = contact_len;
+      memcpy(buff+i_len, req->contacts[idx].c_name_id, contact_len);
+      i_len += contact_len;
+      buff[i_len++] = req->contacts[idx].c_sex;
 
+  }
+  *len = i_len;
   return 0;
 }
 int Request_D_Func(unsigned char *data, void **pvalue,int len)
 {
   printf("Len received in Decode : %d\n",len);
   int i_len = 0;
-  int ie_type = 0;
-  int name_len = 0,mob_len = 0, location_len = 0;
+  int ie_type = 0, idx = 0;
+  int name_len = 0,mob_len = 0, location_len = 0, contacts_count = 0, contact_len = 0;
   user_req_msg_t *req = (user_req_msg_t *)malloc(sizeof(user_req_msg_t));
 
   while(len > i_len)
@@ -80,7 +88,6 @@ int Request_D_Func(unsigned char *data, void **pvalue,int len)
           case NAME:
             name_len = data[i_len++];
             memcpy(req->name,data+i_len,name_len);
-            printf("DName : %s\n",req->name);
             i_len += name_len;
             break;
           case AGE:
@@ -99,8 +106,20 @@ int Request_D_Func(unsigned char *data, void **pvalue,int len)
             memcpy(req->location,data+i_len,location_len);
             i_len += location_len;
             break;
+          case CONTACTS:
+            contacts_count = data[i_len++];
+            req->contact_count = contacts_count;
+            for(idx = 0; idx < contacts_count; idx++)
+            {
+                contact_len = data[i_len++];
+                memcpy(req->contacts[idx].c_name_id,data+i_len , contact_len);
+                i_len += contact_len;
+                req->contacts[idx].c_sex = data[i_len++];
+
+            }
+            break;
           default:
-            printf("[%d][%s]Wrong IE type received\n",__LINE__,__FUNCTION__);
+            printf("[%d][%s]Wrong IE type received : %d\n",__LINE__,__FUNCTION__,ie_type);
 
       }
 
@@ -111,19 +130,101 @@ int Request_D_Func(unsigned char *data, void **pvalue,int len)
 }
 int Response_E_Func(void *data,unsigned char *buff,int *len)
 {
-	return 0;
+    int i_len = 0;
+    int name_len = 0;
+    user_res_msg_t *res = (user_res_msg_t *)data;
+    buff[i_len++] = NAME;
+    name_len = strlen(res->name)+1;
+    buff[i_len++] = name_len;
+    memcpy(buff+i_len,res->name,name_len);
+    i_len += name_len;
+    buff[i_len++] = DATA_PORT;
+    buff[i_len++] = res->data_port;
+
+    *len = i_len;
+
+
+    return 0;
 }
 int Response_D_Func(unsigned char *data, void **pvalue,int len)
 {
-	return 0;
+    int i_len = 0;
+    int ie_type = 0;
+    int name_len = 0;
+    user_res_msg_t *res = (user_res_msg_t *)malloc(sizeof(user_res_msg_t));
+
+    while(len > i_len)
+    {
+        ie_type = data[i_len++];
+        switch(ie_type)
+        {
+            case NAME:
+              name_len = data[i_len++];
+              memcpy(res->name,data+i_len,name_len);
+              i_len += name_len;
+              break;
+            case DATA_PORT:
+              res->data_port = data[i_len++];
+              break;
+            default:
+              printf("[%d][%s]Wrong IE type received : %d\n",__LINE__,__FUNCTION__,ie_type);
+
+        }
+
+
+    }
+    *pvalue = res;
+    return 0;
 }
 int Notification_Req_E(void *data,unsigned char *buff,int *len)
 {
-	return 0;
+  int i_len = 0;
+  int idx = 0, user_count = 0, contact_len = 0;
+  notification_t *notify = (notification_t *)data;
+  buff[i_len++] = CONTACTS;
+  user_count = notify->online_user_cnt;
+  buff[i_len++] = user_count;
+  for(idx = 0; idx < user_count ; idx++) {
+      contact_len = strlen(notify->online_user[idx].online_uid) + 1;
+      buff[i_len++] = contact_len;
+      memcpy(buff+i_len,notify->online_user[idx].online_uid,contact_len );
+      i_len += contact_len;
+      buff[i_len++] = notify->online_user[idx].status;
+  }
+
+  *len = i_len;
+
+  return 0;
 }
 int Notification_Req_D(unsigned char *data, void **pvalue,int len)
 {
-	return 0;
+   int i_len = 0;
+   int ie_type = 0;
+   int contact_len = 0, count = 0, idx = 0;
+   notification_t *notify = (notification_t *)malloc(sizeof(notification_t));
+
+   while(len > i_len) {
+       ie_type = data[i_len++];
+       switch(ie_type)
+       {
+         case CONTACTS:
+         count  = data[i_len++];
+         notify->online_user_cnt = count;
+         printf("D Count : %d\n",count);
+         for(idx = 0; idx < count ; idx++) {
+             contact_len = data[i_len++];
+             memcpy(notify->online_user[idx].online_uid,data+i_len , contact_len);
+             i_len += contact_len;
+             notify->online_user[idx].status = data[i_len++];
+
+         }
+         break;
+       default :
+         printf("[%d][%s]Wrong IE type received : %d\n",__LINE__,__FUNCTION__,ie_type);
+       }
+   }
+   *pvalue = notify;
+   return 0;
 }
 int Notification_Res_E(void *data,unsigned char *buff,int *len)
 {
@@ -157,9 +258,8 @@ int Decode_MSG(unsigned char *data, int *len, int *mt, void **pvalue)
   int msg_type = data[0];
   int msg_len = data[1];
 
- // printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>.. mt : %d\tlen : %d\n",msg_type,msg_len);
   data += 2;
-  msg_len += 2;
+  msg_len -= 2;
   status = PDU_APIs[msg_type].dfunc(data,pvalue,msg_len);
   *mt = msg_type;
   return 0;
@@ -171,10 +271,9 @@ int Encode_MSG(void *msg, unsigned char *buff,int *len,int mt)
   int status = 0,msg_type = 0,msg_len = 0;
   if ( NULL == msg && NULL == buff)
   {
-    printf("[%d][%s]NULL msg or buff received\n",__LINE__,__FUNCTION__);
+    printf("[%d][%s]NULL msg or buff received \n",__LINE__,__FUNCTION__);
     return -1;
   }
-;
 
   status = PDU_APIs[mt].efunc(msg,buff+2,len);
   msg_type = mt;
@@ -184,8 +283,6 @@ int Encode_MSG(void *msg, unsigned char *buff,int *len,int mt)
   buff[1] = msg_len;
 
 
-
-  printf("Ecode Len : %d\n",msg_len);
   return status;
 }
 

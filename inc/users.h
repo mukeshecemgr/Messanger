@@ -1,7 +1,11 @@
 #ifndef _USERS_H
 #define _USERS_H
 
-#define USER_MASTER_Q "/Master_user_mq"
+#define USER_NAME "Mukesh"
+#define SEX 'M'
+#define AGE 30
+#define USER_MASTER_Q "/Master_user_mq_"
+
 
 //typedef int (*msg_recv_cb)(int len,char *data, void *ctx);
 

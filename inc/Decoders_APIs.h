@@ -21,7 +21,10 @@ typedef enum req_
   AGE,
   SEX,
   MOB,
-  LOCATION
+  LOCATION,
+  CONTACTS,
+  ONLINE_COUNT,
+  DATA_PORT
 }req_e;
 
 

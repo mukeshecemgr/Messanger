@@ -6,7 +6,7 @@ server_ctx_t *srvr_ctx;
 
 int servr_ctrl_rx_cb(int len, unsigned char *data, void *ctx)
 {
-        printf("Server Received message %p\n",data);
+     //   printf("Server Received message %p\n",data);
 	ipc_header_t ipc;	
 	master_ipc_t *msg = (master_ipc_t *)malloc(sizeof(master_ipc_t));
 	int mt = 0;
@@ -36,7 +36,6 @@ int servr_ctrl_rx_cb(int len, unsigned char *data, void *ctx)
 
 void start_server(connection_info_t *conn)
 {
-	args_t args;
 	conn->msg_cb = servr_ctrl_rx_cb;
 
 	if ( 0 > (conn->sd = socket(AF_INET,SOCK_DGRAM,0)))
@@ -63,8 +62,6 @@ void start_server(connection_info_t *conn)
 	}
 */
 	//sleep(1);
-	memset(&args,0,sizeof(args_t));
-	//args.arg1 = (int )conn;
 	if ( 0 != task_spawn("Server_rx",25,1600000,
                                           (PFN)server_ctrl_rx_task,(void *)conn))
 	{
@@ -78,7 +75,6 @@ void start_server(connection_info_t *conn)
 
 void server_master_task(void *data)
 {
-        printf("Master thread Created\n");
 	ipc_header_t ipc_msg;
 	master_ipc_t *msg;
 	int status = 0;
@@ -110,7 +106,6 @@ void server_master_task(void *data)
 
 void server_init()
 {
-        printf("Initializing the server\n");
 	args_t args;
 	server_ctx_t *ctx = NULL;
 

@@ -30,7 +30,6 @@ void user_data_rx_task(void *data)
 
 void server_ctrl_rx_task(void *data)
 {
-        printf("Server Waiting for Client...\n");
 	long unsigned int sz = 0;
 	//args_t *args = (args_t *)data;
 	connection_info_t *conn = (connection_info_t *)data;

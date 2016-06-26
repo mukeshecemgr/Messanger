@@ -1,5 +1,24 @@
 #include "common.h"
 #include "utils.h"
+
+void *slist_find(slist_t *list, slist_find_compare_func comp,void *user_data) {
+
+  slist_t *start = list;
+  int comp_res = 0;
+  if ( NULL == start && NULL == start->node) {
+      return NULL;
+  }
+  while(start != NULL && start->node != NULL) {
+      comp_res = comp(start->node, user_data);
+      if ( comp_res == 0) {
+          return start->node;
+      }
+      start = start->next;
+  }
+  return NULL;
+
+}
+
 void slist_add(slist_t **list, void *item)
 {
 	slist_t *new = NULL;
