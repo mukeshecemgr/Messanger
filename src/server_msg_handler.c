@@ -120,7 +120,7 @@ int server_handle_user_req_msg(void *data, void *ctx)
         user_conn->user_ctx->contacts[idx].c_sex = req->contacts[idx].c_sex;
 
     }
-
+    user_conn->ctx = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in));
     memcpy((char *)user_conn->ctx,(char *)clnt,sizeof(struct sockaddr_in));
     user_conn->reg_state = TRUE;
 
