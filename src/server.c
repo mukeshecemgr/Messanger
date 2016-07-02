@@ -44,7 +44,7 @@ void start_server(connection_info_t *conn)
 	}
 	conn->srvr.sin_family = AF_INET;
 	conn->srvr.sin_port = htons(11111);
-	conn->srvr.sin_addr.s_addr = inet_addr("192.168.1.1");
+	conn->srvr.sin_addr.s_addr = inet_addr("192.168.0.14");
 
 	if ( 0 > (bind(conn->sd,(struct sockaddr *)&conn->srvr,
 					sizeof(struct sockaddr))))
