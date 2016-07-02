@@ -63,31 +63,18 @@ void fill_user_and_conn_info(user_ctx_t *user,unsigned char *uname)
         printf("file:%s\n",db_file);
         exit(1);
     }
+    fscanf(fd,"%s\n",user->me->name);
+    fscanf(fd,"%c\n",&user->me->sex);
+    fscanf(fd,"%d\n",&user->me->age);
+    fscanf(fd,"%s\n",user->me->mobile_num);
+    fscanf(fd,"%s\n",user->me->location);
+    fscanf(fd,"%s\n",user->ctrl_conn->serv_ip);
+    fscanf(fd,"%d\n",&user->ctrl_conn->serv_port);
+    fscanf(fd,"%s\n",user->ctrl_conn->client_ip);
+    fscanf(fd,"%d\n",&user->ctrl_conn->client_port);
+    fscanf(fd,"%s\n",user->ctrl_conn->interface);
 
-  //  while(!feof(fd)) {
-        fscanf(fd,"%s\n",user->me->name);
-        fscanf(fd,"%c\n",&user->me->sex);
-        fscanf(fd,"%d\n",&user->me->age);
-        fscanf(fd,"%s\n",user->me->mobile_num);
-        fscanf(fd,"%s\n",user->me->location);
-        fscanf(fd,"%s\n",user->ctrl_conn->serv_ip);
-        fscanf(fd,"%d\n",&user->ctrl_conn->serv_port);
-        fscanf(fd,"%s\n",user->ctrl_conn->client_ip);
-        fscanf(fd,"%d\n",&user->ctrl_conn->client_port);
-        fscanf(fd,"%s\n",user->ctrl_conn->interface);
-
-    //}
     fclose(fd);
-    printf("Name : %s\n",user->me->name);
-    printf("Sex : %c\n",user->me->sex);
-    printf("Age : %d\n",user->me->age);
-    printf("Location : %s\n",user->me->location);
-    printf("Server IP:%s\n",user->ctrl_conn->serv_ip);
-    printf("Server Port : %d\n",user->ctrl_conn->serv_port);
-
-
-
-
 
     return;
 }
@@ -167,13 +154,11 @@ void user_init()
 		printf("Failed to prepare request message\n");
 		return;
 	}
-/*
 	if ( 0 != task_spawn("Online_friend_task",25,1600000,(PFN)online_friend_task,&args))
         {
                 printf("Failed to create user master task\n");
                 exit(1);
         }
-*/
 	init_usr_msg_data_path(user->data_conn);
 
 

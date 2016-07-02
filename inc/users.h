@@ -1,11 +1,15 @@
 #ifndef _USERS_H
 #define _USERS_H
 
+#include <sys/stat.h>
+
 #define USER_NAME "Mukesh"
 #define SEX 'M'
 #define AGE 30
 #define USER_MASTER_Q "/Master_user_mq_"
 
+#define CONTACT_FILE "Contact/contact_"
+#define USER_DB "user_db/db_"
 
 //typedef int (*msg_recv_cb)(int len,char *data, void *ctx);
 
@@ -17,6 +21,7 @@ typedef struct user_info_
 	char location[100];
 	char mobile_num[11];
 	int data_port;
+	int control_port;
 }user_info_t;
 
 typedef struct online_userinfo_
@@ -32,8 +37,6 @@ typedef struct online_userinfo_
 
 typedef struct user_ctx_
 {
-	int ctrl_port;
-	int data_port;
 	int master_qid;
 	user_info_t *me;
 	slist_t *online;

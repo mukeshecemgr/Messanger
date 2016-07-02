@@ -31,10 +31,14 @@ typedef int (*msg_recv_cb)(int,unsigned char *,void *);
 typedef struct connection_info_
 {
 	int rx_qid;
-	int port;
+	int serv_port;
 	int sd;
-	char ip[16];
+	char serv_ip[16];
+	char client_ip[16];
+	int client_port;
+	char interface[7];
 	struct sockaddr_in srvr;
+	struct sockaddr_in clnt;
 	msg_recv_cb msg_cb;
 }connection_info_t;
 

@@ -2,7 +2,6 @@
 #include <signal.h>
 
 unsigned char uname[30] = {0};
-
 int signal_handler()
 {
 	/* Write all thread, socket and db de-initialize functions*/

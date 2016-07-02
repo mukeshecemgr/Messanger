@@ -74,7 +74,6 @@ int Request_E_Func(void *data,unsigned char *buff,int *len)
 }
 int Request_D_Func(unsigned char *data, void **pvalue,int len)
 {
-  printf("Len received in Decode : %d\n",len);
   int i_len = 0;
   int ie_type = 0, idx = 0;
   int name_len = 0,mob_len = 0, location_len = 0, contacts_count = 0, contact_len = 0;
@@ -210,7 +209,6 @@ int Notification_Req_D(unsigned char *data, void **pvalue,int len)
          case CONTACTS:
          count  = data[i_len++];
          notify->online_user_cnt = count;
-         printf("D Count : %d\n",count);
          for(idx = 0; idx < count ; idx++) {
              contact_len = data[i_len++];
              memcpy(notify->online_user[idx].online_uid,data+i_len , contact_len);

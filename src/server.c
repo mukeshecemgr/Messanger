@@ -6,7 +6,6 @@ server_ctx_t *srvr_ctx;
 
 int servr_ctrl_rx_cb(int len, unsigned char *data, void *ctx)
 {
-     //   printf("Server Received message %p\n",data);
 	ipc_header_t ipc;	
 	master_ipc_t *msg = (master_ipc_t *)malloc(sizeof(master_ipc_t));
 	int mt = 0;
@@ -44,8 +43,8 @@ void start_server(connection_info_t *conn)
 		exit(1);
 	}
 	conn->srvr.sin_family = AF_INET;
-	conn->srvr.sin_port = 11111;
-	conn->srvr.sin_addr.s_addr = inet_addr("127.0.0.1");
+	conn->srvr.sin_port = htons(11111);
+	conn->srvr.sin_addr.s_addr = inet_addr("192.168.1.1");
 
 	if ( 0 > (bind(conn->sd,(struct sockaddr *)&conn->srvr,
 					sizeof(struct sockaddr))))
