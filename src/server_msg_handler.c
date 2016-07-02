@@ -98,54 +98,55 @@ int prepare_send_res_message(user_req_msg_t *req, void *ctx)
 
 int server_handle_user_req_msg(void *data, void *ctx)
 {
+    struct sockaddr_in *clnt = (struct sockaddr_in *)ctx;
     user_conn_details_t *user_conn = NULL;
     user_req_msg_t *req = (user_req_msg_t *)data;
     int idx = 0;
     unsigned char uname[30] = {0};
 
-  user_conn = (user_conn_details_t *)malloc(sizeof(user_conn_details_t));
-  memset(user_conn,0,sizeof(user_conn_details_t));
-  user_conn->user_ctx = (user_req_msg_t *)malloc(sizeof(user_req_msg_t));
-  memset(user_conn->user_ctx,0,sizeof(user_details_t));
-  strcpy(user_conn->user_ctx->name,req->name);
-  user_conn->user_ctx->sex = req->sex;
-  user_conn->user_ctx->age = (int)req->age;
-  strcpy(user_conn->user_ctx->mob,req->mob);
-  strcpy(user_conn->user_ctx->location,req->location);
-  user_conn->user_ctx->contact_count = req->contact_count;
+    user_conn = (user_conn_details_t *)malloc(sizeof(user_conn_details_t));
+    memset(user_conn,0,sizeof(user_conn_details_t));
+    user_conn->user_ctx = (user_req_msg_t *)malloc(sizeof(user_req_msg_t));
+    memset(user_conn->user_ctx,0,sizeof(user_details_t));
+    strcpy(user_conn->user_ctx->name,req->name);
+    user_conn->user_ctx->sex = req->sex;
+    user_conn->user_ctx->age = (int)req->age;
+    strcpy(user_conn->user_ctx->mob,req->mob);
+    strcpy(user_conn->user_ctx->location,req->location);
+    user_conn->user_ctx->contact_count = req->contact_count;
 
-  for (idx = 0; idx < user_conn->user_ctx->contact_count; idx++){
-      strcpy(user_conn->user_ctx->contacts[idx].c_name_id,req->contacts[idx].c_name_id);
-      user_conn->user_ctx->contacts[idx].c_sex = req->contacts[idx].c_sex;
+    for (idx = 0; idx < user_conn->user_ctx->contact_count; idx++){
+        strcpy(user_conn->user_ctx->contacts[idx].c_name_id,req->contacts[idx].c_name_id);
+        user_conn->user_ctx->contacts[idx].c_sex = req->contacts[idx].c_sex;
 
-  }
+    }
 
-  user_conn->ctx = ctx;
-  user_conn->reg_state = TRUE;
+    memcpy((char *)user_conn->ctx,(char *)clnt,sizeof(struct sockaddr_in));
+    user_conn->reg_state = TRUE;
 
-  strcpy(uname,req->name);
-  /**
-   * Adding to list
-   */
-  slist_add(&srvr_ctx->users_connected,(void *)user_conn);
+    strcpy(uname,req->name);
+    /**
+     * Adding to list
+     */
+    slist_add(&srvr_ctx->users_connected,(void *)user_conn);
 
-  if ( 0 == prepare_send_res_message(req,ctx))
-  {
-      printf("Failed to send response message\n");
-      return -1;
-  }
+    if ( 0 == prepare_send_res_message(req,ctx))
+    {
+        printf("Failed to send response message\n");
+        return -1;
+    }
 
-  if ( 0 != task_spawn("Notification_task",25,1600000,(PFN)per_user_notification,(void *)req->name))
-  {
-          printf("Failed to create Per Usr Notification task\n");
-          exit(1);
-  }
-  /*
-  if ( 0 == prepare_send_notification(req->name) ){
-      printf("Failed to send response message\n");
-      return -1;
-  } */
-  return 0;
+    if ( 0 != task_spawn("Notification_task",25,1600000,(PFN)per_user_notification,(void *)req->name))
+    {
+            printf("Failed to create Per Usr Notification task\n");
+            exit(1);
+    }
+    /*
+    if ( 0 == prepare_send_notification(req->name) ){
+        printf("Failed to send response message\n");
+        return -1;
+    } */
+    return 0;
 }
 /*****************************************
  * NOtification Message Prep and Sending

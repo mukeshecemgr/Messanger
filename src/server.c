@@ -6,30 +6,31 @@ server_ctx_t *srvr_ctx;
 
 int servr_ctrl_rx_cb(int len, unsigned char *data, void *ctx)
 {
-	ipc_header_t ipc;	
-	master_ipc_t *msg = (master_ipc_t *)malloc(sizeof(master_ipc_t));
-	int mt = 0;
-	void *pvalue = NULL;
-	if ( 0 != Decode_MSG(data,&len,&mt,&pvalue))
-	{
-		printf("[%d][%s]failed to decode message\n",__LINE__,__FUNCTION__);
-		return;
-	}
 
-	msg->data = pvalue;
-	msg->ctx = ctx;
+    ipc_header_t ipc;
+    master_ipc_t *msg = (master_ipc_t *)malloc(sizeof(master_ipc_t));
+    int mt = 0;
+    void *pvalue = NULL;
+    if ( 0 != Decode_MSG(data,&len,&mt,&pvalue))
+    {
+            printf("[%d][%s]failed to decode message\n",__LINE__,__FUNCTION__);
+            return;
+    }
 
-	/*Send to master task, Where all control message will be
-	* processes */
-	ipc.type = mt;
-	ipc.len = sizeof(ipc_header_t);
-	ipc.data = msg;
-	if ( 0 != task_mq_send(SERVER_MASTER_MQ,srvr_ctx->server_master_mq_id,
-					(char *)&ipc,sizeof(ipc_header_t),0))
-	{
-		printf("[%d][%s]Failed to post into mq\n",__LINE__,__FUNCTION__);
-		return;
-	}
+    msg->data = pvalue;
+    msg->ctx = ctx;
+
+    /*Send to master task, Where all control message will be
+    * processes */
+    ipc.type = mt;
+    ipc.len = sizeof(ipc_header_t);
+    ipc.data = msg;
+    if ( 0 != task_mq_send(SERVER_MASTER_MQ,srvr_ctx->server_master_mq_id,
+                                    (char *)&ipc,sizeof(ipc_header_t),0))
+    {
+            printf("[%d][%s]Failed to post into mq\n",__LINE__,__FUNCTION__);
+            return;
+    }
 	
 }
 

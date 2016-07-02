@@ -27,7 +27,9 @@ typedef struct user_details
 typedef struct user_conn_details
 {
   user_req_msg_t *user_ctx;
-  void *ctx;
+
+  struct sockaddr_in *ctx;
+  //void *ctx;
   int reg_state; //0-Not Registered, 1- Registered
   slist_t *friends; //Implemet later when chatting starts successfully
 }user_conn_details_t;
