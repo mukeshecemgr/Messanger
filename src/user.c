@@ -3,6 +3,8 @@
 #include "message.h"
 #include "utils.h"
 
+
+
 user_ctx_t *user = NULL;
 extern unsigned char uname[30];
 unsigned char mq_name[40] = {0};
@@ -41,16 +43,53 @@ void user_master_task(void *data)
 	}
 }
 
-void fill_user_info(user_info_t *me)
+void fill_user_and_conn_info(user_ctx_t *user,unsigned char *uname)
 {
-	//printf("Enter personal Information\n");
-//	printf("Name:");
-//	scanf("%s",me->name);
-//	printf("Age:");
-//	scanf("%d",&me->age);
-	//printf("Sex :");
-//	scanf("%c",&me->sex);
-	return;
+    printf("Reading %s info\n",uname);
+    unsigned char db_file[30] = {0};
+    FILE *fd;
+
+    user->me = (user_info_t *)malloc(sizeof(user_info_t));
+    memset(user->me,0,sizeof(user_info_t));
+    user->ctrl_conn = (connection_info_t *)malloc(sizeof(connection_info_t));
+    memset(user->ctrl_conn,0,sizeof(connection_info_t));
+
+    strcpy(db_file,USER_DB);
+    strcat(db_file,uname);
+
+    fd = fopen(db_file,"r");
+    if (fd == NULL) {
+        perror("fopen()");
+        printf("file:%s\n",db_file);
+        exit(1);
+    }
+
+  //  while(!feof(fd)) {
+        fscanf(fd,"%s\n",user->me->name);
+        fscanf(fd,"%c\n",&user->me->sex);
+        fscanf(fd,"%d\n",&user->me->age);
+        fscanf(fd,"%s\n",user->me->mobile_num);
+        fscanf(fd,"%s\n",user->me->location);
+        fscanf(fd,"%s\n",user->ctrl_conn->serv_ip);
+        fscanf(fd,"%d\n",&user->ctrl_conn->serv_port);
+        fscanf(fd,"%s\n",user->ctrl_conn->client_ip);
+        fscanf(fd,"%d\n",&user->ctrl_conn->client_port);
+        fscanf(fd,"%s\n",user->ctrl_conn->interface);
+
+    //}
+    fclose(fd);
+    printf("Name : %s\n",user->me->name);
+    printf("Sex : %c\n",user->me->sex);
+    printf("Age : %d\n",user->me->age);
+    printf("Location : %s\n",user->me->location);
+    printf("Server IP:%s\n",user->ctrl_conn->serv_ip);
+    printf("Server Port : %d\n",user->ctrl_conn->serv_port);
+
+
+
+
+
+    return;
 }
 
 void online_friend_task(void *data)
@@ -58,7 +97,7 @@ void online_friend_task(void *data)
   online_users_t *ol_friends = NULL;
   slist_t *list = NULL;
   int counter=0, i = 0;
-  printf("|\n----------------------------------------------------------\n");
+  printf("\n|----------------------------------------------------------\n");
   while (1) {
       if ( NULL == user->online) {
               continue;
@@ -66,6 +105,7 @@ void online_friend_task(void *data)
       for(i  = 0;i < counter+1 ; i++) {
           fputs("\033[A\033[2K",stdout);
       }
+
       list = user->online;
       counter = 0;
       while(list != NULL) {
@@ -78,12 +118,11 @@ void online_friend_task(void *data)
       printf("|----------------------------------------------------------\n");
       rewind(stdout);
       sleep(2);
-
-
   }
 }
 void user_init()
 {
+
 
         args_t args;
 	if ( NULL == user)
@@ -96,10 +135,9 @@ void user_init()
         }
 	    memset(user,0,sizeof(user_ctx_t));
 	}
-	user->me = (user_info_t *)malloc(sizeof(user_info_t));
-	memset(user->me,0,sizeof(user_info_t));
 
-	fill_user_info(user->me);
+
+	fill_user_and_conn_info(user,uname);
 
 	memset(&args,0,sizeof(args_t));
 
@@ -121,8 +159,6 @@ void user_init()
 	 * Initialize control path and send request message
 	 */
 	
-	user->ctrl_conn = (connection_info_t *)malloc(sizeof(connection_info_t));
-	memset(user->ctrl_conn,0,sizeof(connection_info_t));
 
 	init_ctrl_path(user->ctrl_conn);
 	
@@ -131,12 +167,13 @@ void user_init()
 		printf("Failed to prepare request message\n");
 		return;
 	}
-
+/*
 	if ( 0 != task_spawn("Online_friend_task",25,1600000,(PFN)online_friend_task,&args))
         {
                 printf("Failed to create user master task\n");
                 exit(1);
         }
+*/
 	init_usr_msg_data_path(user->data_conn);
 
 
@@ -147,8 +184,6 @@ void user_init()
 void init_ctrl_path(connection_info_t *ctrl)
 {
 	args_t args;
-	strcpy(ctrl->ip,"127.0.0.1");
-	ctrl->port = 11111;
 	ctrl->msg_cb = ctrl_recv_cb;
 
 	if( 0 > (ctrl->sd = socket(AF_INET,SOCK_DGRAM,0)) )
@@ -157,10 +192,22 @@ void init_ctrl_path(connection_info_t *ctrl)
 		exit(1);
 	}
 
+	/* Filling network detail */
 	ctrl->srvr.sin_family = AF_INET;
-	ctrl->srvr.sin_port = ctrl->port;
-	ctrl->srvr.sin_addr.s_addr = inet_addr(ctrl->ip);
+	ctrl->srvr.sin_port = htons(ctrl->serv_port);
+	ctrl->srvr.sin_addr.s_addr = inet_addr(ctrl->serv_ip);
 
+	/*Filling client details*/
+	ctrl->clnt.sin_family = AF_INET;
+	ctrl->clnt.sin_port = htons(ctrl->client_port);
+	ctrl->clnt.sin_addr.s_addr = inet_addr(ctrl->client_ip);
+/*
+
+	int rc=setsockopt(ctrl->sd , SOL_SOCKET, SO_BINDTODEVICE, ctrl->interface, 1 + strlen(ctrl->interface));
+	if ( 0 > rc) {
+	    printf("Error : Failed to set interface option\n ");
+	}
+*/
 	args.arg1 =(int) ctrl;
 /*
 if (0==( ctrl->rx_qid = task_mq_create(100,sizeof(ipc_header_t),0,"ctrl_rx")))
